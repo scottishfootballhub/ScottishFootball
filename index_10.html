@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scottish Premiership // Neon Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050810;
+    --celtic:#00e676;
+    --celtic-dim:rgba(0,230,118,0.25);
+    --rangers:#2979ff;
+    --rangers-dim:rgba(41,121,255,0.25);
+    --gold:#ffd23f;
+    --text:#eaf2ff;
+    --dim:#8b93b8;
+    --card:rgba(12,16,30,0.65);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 12% 10%, rgba(0,230,118,0.16), transparent 42%),
+      radial-gradient(circle at 88% 12%, rgba(41,121,255,0.16), transparent 42%),
+      radial-gradient(circle at 50% 100%, rgba(255,210,63,0.08), transparent 45%),
+      repeating-linear-gradient(115deg, rgba(0,230,118,0.05) 0 60px, rgba(0,0,0,0) 60px 120px),
+      var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events:none; z-index:0;
+    mask-image: radial-gradient(ellipse at 50% 15%, black 20%, transparent 75%);
+  }
+  /* pitch markings decoration behind the hero */
+  .pitch-deco{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:min(720px, 140vw); height:360px; pointer-events:none; z-index:0; opacity:0.35;
+  }
+  .pitch-deco .circle{
+    position:absolute; top:40px; left:50%; transform:translateX(-50%);
+    width:260px; height:260px; border-radius:50%; border:1.5px solid rgba(0,230,118,0.45);
+  }
+  .pitch-deco .circle::after{
+    content:""; position:absolute; top:50%; left:50%; width:6px; height:6px; border-radius:50%;
+    background:rgba(0,230,118,0.6); transform:translate(-50%,-50%);
+  }
+  .pitch-deco .halfway{
+    position:absolute; top:170px; left:0; right:0; height:1.5px; background:rgba(255,255,255,0.14);
+  }
+  .pitch-deco .arc-left, .pitch-deco .arc-right{
+    position:absolute; top:130px; width:70px; height:70px; border-radius:50%;
+    border:1.5px solid rgba(41,121,255,0.35);
+  }
+  .pitch-deco .arc-left{left:-35px;}
+  .pitch-deco .arc-right{right:-35px;}
+  .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 24px;}
+
+  nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
+    background:rgba(5,8,16,0.72); border-bottom:1px solid rgba(255,255,255,0.08);}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 24px;}
+  .brand{font-family:'Orbitron',sans-serif; font-weight:900; font-size:1.05rem; letter-spacing:1.5px;}
+  .brand .c{color:var(--celtic); text-shadow:0 0 8px var(--celtic);}
+  .brand .r{color:var(--rangers); text-shadow:0 0 8px var(--rangers);}
+  .visit-counter{font-size:0.68rem; color:var(--dim); margin-top:2px; letter-spacing:0.3px; cursor:help;}
+  .visit-counter strong{color:var(--gold);}
+  .navlinks{display:flex; gap:22px; list-style:none;}
+  .navlinks a{color:var(--dim); text-decoration:none; font-weight:600; font-size:0.8rem;
+    letter-spacing:1px; text-transform:uppercase; transition:.25s;}
+  .navlinks a:hover{color:var(--gold); text-shadow:0 0 8px var(--gold);}
+
+  header.hero{text-align:center; padding:64px 24px 36px; position:relative; overflow:hidden;}
+  .kicker{display:inline-block; font-family:'Orbitron',sans-serif; font-size:0.66rem;
+    letter-spacing:4px; color:var(--gold); border:1px solid var(--gold);
+    padding:6px 16px; border-radius:20px; text-shadow:0 0 8px var(--gold);
+    box-shadow:inset 0 0 12px rgba(255,210,63,0.15), 0 0 12px rgba(255,210,63,0.2);
+    margin-bottom:22px;}
+  h1.title{font-family:'Orbitron',sans-serif; font-weight:900;
+    font-size:clamp(1.9rem,5.6vw,3.8rem); line-height:1.08;
+    background:linear-gradient(90deg, var(--celtic), var(--text) 48%, var(--rangers));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter: drop-shadow(0 0 16px rgba(0,230,118,0.3)) drop-shadow(0 0 26px rgba(41,121,255,0.3));
+    letter-spacing:1px;}
+  .subtitle{color:var(--dim); font-size:1rem; margin-top:14px;}
+
+  section{padding:44px 24px;}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+  .section-head h2{font-family:'Orbitron',sans-serif; font-size:1.25rem; letter-spacing:2px; text-transform:uppercase;}
+  .section-head .bar{flex:1; height:2px; background:linear-gradient(90deg, var(--gold), transparent);}
+  .section-sub{color:var(--dim); font-size:0.87rem; margin-bottom:24px;}
+
+  /* SEASON COUNTDOWN */
+  .season-card{
+    background:var(--card); border:1px solid rgba(255,210,63,0.3); border-radius:18px;
+    padding:26px 30px; text-align:center; box-shadow:0 0 24px rgba(255,210,63,0.06);
+  }
+  .season-countdown{
+    font-family:'Orbitron',sans-serif; letter-spacing:3px; font-size:1.5rem; color:var(--gold);
+    text-shadow:0 0 12px rgba(255,210,63,0.5); margin:8px 0;
+  }
+  .season-meta{color:var(--dim); font-size:0.88rem;}
+
+  /* OLD FIRM SPOTLIGHT */
+  .derby-card{
+    background:var(--card); border:1px solid rgba(255,210,63,0.35); border-radius:18px;
+    padding:30px; position:relative; overflow:hidden;
+    box-shadow:0 0 30px rgba(255,210,63,0.08);
+  }
+  .derby-teams{display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:wrap;}
+  .club{display:flex; flex-direction:column; align-items:center; gap:10px; width:150px;}
+  .crest{
+    width:66px; height:66px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Orbitron',sans-serif; font-weight:900; font-size:1.2rem; flex-shrink:0;
+  }
+  .crest.celtic{background:radial-gradient(circle, rgba(0,230,118,0.25), transparent 70%);
+    border:2px solid var(--celtic); color:var(--celtic); box-shadow:0 0 20px var(--celtic-dim);}
+  .crest.rangers{background:radial-gradient(circle, rgba(41,121,255,0.25), transparent 70%);
+    border:2px solid var(--rangers); color:var(--rangers); box-shadow:0 0 20px var(--rangers-dim);}
+  .club-name{font-weight:700; font-size:1.1rem;}
+  .vs-badge{font-family:'Orbitron',sans-serif; color:var(--gold); font-size:1rem; letter-spacing:2px;}
+  .derby-meta{text-align:center; margin-top:20px; color:var(--dim); font-size:0.88rem;}
+  .countdown{
+    text-align:center; font-family:'Orbitron',sans-serif; letter-spacing:3px;
+    margin:20px 0 4px; font-size:1.3rem; color:var(--gold);
+    text-shadow:0 0 12px rgba(255,210,63,0.55);
+  }
+  .watch-row{display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap;}
+  .watch-btn{
+    text-decoration:none; font-family:'Orbitron',sans-serif; font-size:0.7rem; letter-spacing:2px;
+    padding:12px 20px; border-radius:10px; text-transform:uppercase; font-weight:700;
+    color:#05040d; background:linear-gradient(90deg, var(--celtic), var(--rangers));
+    box-shadow:0 0 16px rgba(255,255,255,0.12); transition:.25s;
+  }
+  .watch-btn:hover{filter:brightness(1.15);}
+  .watch-btn.outline{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.3);}
+
+  /* MATCH CARDS (fixtures / results) */
+  .match-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px;}
+  .match-card{background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px;}
+  .badge-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap;}
+  .badge{font-family:'Orbitron',sans-serif; font-size:0.6rem; letter-spacing:2px; padding:4px 10px;
+    border-radius:20px; text-transform:uppercase; background:rgba(255,255,255,0.06); color:var(--dim);
+    border:1px solid rgba(255,255,255,0.15); white-space:nowrap;}
+  .badge.tv{background:rgba(255,210,63,0.12); color:var(--gold); border:1px solid var(--gold);}
+  .venue{color:var(--dim); font-size:0.74rem; text-align:right;}
+  .teams-row{display:flex; align-items:center; justify-content:space-between; margin:8px 0;}
+  .team{display:flex; flex-direction:column; align-items:center; gap:6px; width:40%;}
+  .team-name{font-weight:700; font-size:0.98rem; text-align:center;}
+  .score{font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:900; color:var(--gold);
+    text-shadow:0 0 10px rgba(255,210,63,0.5);}
+  .vs-small{font-family:'Orbitron',sans-serif; color:var(--dim); font-size:0.85rem;}
+  .note{text-align:center; color:var(--dim); font-size:0.8rem; margin-top:6px;}
+
+  /* FIXTURE EXPLORER */
+  .filter-bar{background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:16px;
+    padding:20px 22px; margin-bottom:24px; display:flex; flex-direction:column; gap:16px;}
+  .filter-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .filter-label{font-family:'Orbitron',sans-serif; font-size:0.68rem; letter-spacing:2px; color:var(--dim);
+    text-transform:uppercase; width:70px; flex-shrink:0;}
+  .chip{
+    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.82rem; letter-spacing:0.5px;
+    padding:7px 14px; border-radius:20px; background:transparent; color:var(--dim);
+    border:1px solid rgba(255,255,255,0.18); cursor:pointer; transition:.2s;
+  }
+  .chip:hover{border-color:var(--gold); color:var(--gold);}
+  .chip.active{background:rgba(255,210,63,0.15); color:var(--gold); border-color:var(--gold);
+    box-shadow:0 0 10px rgba(255,210,63,0.25);}
+  .chip.club.active{background:rgba(0,230,118,0.15); color:var(--celtic); border-color:var(--celtic);
+    box-shadow:0 0 10px rgba(0,230,118,0.25);}
+  .date-inputs{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .date-inputs input[type=date]{
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.18); border-radius:8px;
+    color:var(--text); font-family:'Rajdhani',sans-serif; font-size:0.82rem; padding:6px 10px;
+    color-scheme:dark;
+  }
+  .date-inputs span{color:var(--dim); font-size:0.8rem;}
+  .results-meta{color:var(--dim); font-size:0.82rem; margin-bottom:16px;}
+  .match-card.friendly{border-style:dashed;}
+  .badge.friendly-badge{background:rgba(41,121,255,0.12); color:var(--rangers); border:1px solid var(--rangers);}
+  .badge.league-badge{background:rgba(0,230,118,0.12); color:var(--celtic); border:1px solid var(--celtic);}
+  .badge.past{opacity:0.55;}
+  #noResults{text-align:center; color:var(--dim); padding:40px 0; font-size:0.95rem;}
+
+  /* TABLES */
+  table.sched{width:100%; border-collapse:collapse; font-size:0.92rem;}
+  table.sched th{text-align:left; padding:11px 14px; color:var(--gold); font-family:'Orbitron',sans-serif;
+    font-size:0.66rem; letter-spacing:1.5px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.15);}
+  table.sched td{padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.06);}
+  table.sched tr:hover td{background:rgba(255,255,255,0.03);}
+  table.sched td.num, table.sched th.num{text-align:center;}
+  .tag{font-size:0.64rem; padding:3px 9px; border-radius:12px; font-family:'Orbitron',sans-serif;
+    letter-spacing:1px; text-transform:uppercase; background:rgba(255,210,63,0.12); color:var(--gold);
+    border:1px solid var(--gold); white-space:nowrap;}
+  .tag.of{background:rgba(0,230,118,0.12); color:var(--celtic); border:1px solid var(--celtic);}
+
+  /* PREDICTIONS */
+  .pred-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px;}
+  .pred-card{
+    background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:16px;
+    padding:22px; position:relative; overflow:hidden;
+  }
+  .pred-card.unlocked{border-color:rgba(255,210,63,0.4); box-shadow:0 0 22px rgba(255,210,63,0.08);}
+  .pred-card.locked{opacity:0.6;}
+  .pred-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;}
+  .pred-fixture{font-weight:700; font-size:1rem;}
+  .pred-meta{color:var(--dim); font-size:0.78rem; margin-bottom:14px;}
+  .conf{font-family:'Orbitron',sans-serif; font-size:0.6rem; letter-spacing:1.5px; padding:4px 10px;
+    border-radius:20px; text-transform:uppercase; white-space:nowrap;}
+  .conf.high{background:rgba(0,230,118,0.15); color:var(--celtic); border:1px solid var(--celtic);}
+  .conf.medium{background:rgba(255,210,63,0.15); color:var(--gold); border:1px solid var(--gold);}
+  .conf.low{background:rgba(41,121,255,0.15); color:var(--rangers); border:1px solid var(--rangers);}
+  .pred-score{
+    font-family:'Orbitron',sans-serif; font-size:1.6rem; font-weight:900; text-align:center;
+    color:var(--gold); text-shadow:0 0 10px rgba(255,210,63,0.45); margin:10px 0;
+  }
+  .pred-text{color:var(--text); font-size:0.88rem; line-height:1.55;}
+  .pred-lock-icon{font-size:1.6rem; text-align:center; margin-bottom:8px; opacity:0.7;}
+  .pred-unlock-note{text-align:center; color:var(--dim); font-size:0.85rem;}
+  .ball-icon{display:inline-block; margin-right:6px;}
+
+  /* LIVE STATS */
+  .live-card{
+    background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:18px;
+    padding:28px 30px; text-align:center;
+  }
+  .live-card.is-live{border-color:rgba(255,47,47,0.5); box-shadow:0 0 26px rgba(255,47,47,0.12);}
+  .live-dot{
+    display:inline-block; width:9px; height:9px; border-radius:50%; background:#ff3b3b;
+    margin-right:8px; box-shadow:0 0 8px #ff3b3b; animation:livepulse 1.2s infinite;
+  }
+  @keyframes livepulse{0%,100%{opacity:1;} 50%{opacity:0.3;}}
+  .live-badge-text{font-family:'Orbitron',sans-serif; font-size:0.72rem; letter-spacing:2px; color:#ff6b6b; text-transform:uppercase;}
+  .live-fixture{font-family:'Orbitron',sans-serif; font-size:1.3rem; margin:14px 0 6px;}
+  .live-clock{color:var(--gold); font-family:'Orbitron',sans-serif; font-size:1rem; margin-bottom:14px;}
+  .live-stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-top:18px; text-align:left;}
+  .stat-box{background:rgba(255,255,255,0.04); border-radius:10px; padding:12px 14px; font-size:0.8rem; color:var(--dim);}
+  .live-note{color:var(--dim); font-size:0.85rem; margin-top:16px; line-height:1.5;}
+  .live-idle-icon{font-size:2rem; margin-bottom:10px;}
+
+  /* MVPs */
+  .mvp-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px;}
+  .mvp-card{
+    background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:16px;
+    padding:20px; display:flex; flex-direction:column; gap:8px;
+  }
+  .mvp-club{font-family:'Orbitron',sans-serif; font-size:0.95rem; letter-spacing:1px; color:var(--text);}
+  .mvp-match{color:var(--dim); font-size:0.78rem;}
+  .mvp-name{
+    font-family:'Orbitron',sans-serif; font-size:1.05rem; color:var(--gold);
+    text-shadow:0 0 8px rgba(255,210,63,0.35); margin-top:4px;
+  }
+  .mvp-name.none{font-family:'Rajdhani',sans-serif; font-size:0.9rem; color:var(--dim); font-style:italic; text-shadow:none;}
+  .mvp-reason{color:var(--text); font-size:0.83rem; line-height:1.5;}
+  .mvp-src-tag{
+    align-self:flex-start; font-size:0.6rem; padding:3px 8px; border-radius:10px;
+    font-family:'Orbitron',sans-serif; letter-spacing:1px; text-transform:uppercase;
+    background:rgba(41,121,255,0.12); color:var(--rangers); border:1px solid var(--rangers);
+  }
+  .mvp-src-tag.stale{background:rgba(255,255,255,0.06); color:var(--dim); border:1px solid rgba(255,255,255,0.2);}
+
+  /* WATCH */
+  .watch-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px;}
+  .watch-card{background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:22px;}
+  .watch-card h4{font-family:'Orbitron',sans-serif; font-size:0.86rem; letter-spacing:1.5px; margin-bottom:10px;}
+  .watch-card p{color:var(--dim); font-size:0.84rem; margin-bottom:12px; line-height:1.5;}
+  .watch-card a{color:var(--gold); text-decoration:none; font-weight:600; font-size:0.84rem;}
+  .watch-card a:hover{text-shadow:0 0 8px var(--gold);}
+
+  .disclaimer{max-width:820px; margin:0 auto; text-align:center; color:var(--dim); font-size:0.78rem;
+    line-height:1.6; border-top:1px solid rgba(255,255,255,0.1); padding-top:24px;}
+  footer{padding:50px 24px 70px; text-align:center;}
+
+  @media (max-width:640px){.navlinks{display:none;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div>
+      <div class="brand"><span class="c">SCOTTISH</span> <span class="r">PREM</span> · NEON</div>
+      <div class="visit-counter" id="visitCounter" title="Real page-load count from a live counting API — not a live 'currently online' figure, and not fabricated.">👥 counting…</div>
+    </div>
+    <ul class="navlinks">
+      <li><a href="#opener">Season</a></li>
+      <li><a href="#fixtures">Fixtures</a></li>
+      <li><a href="#predictions">Predictions</a></li>
+      <li><a href="#livestats">Live Stats</a></li>
+      <li><a href="#mvps">MVPs</a></li>
+      <li><a href="#table">Table</a></li>
+      <li><a href="#oldfirm">Old Firm</a></li>
+      <li><a href="#watch">Watch</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="pitch-deco">
+    <div class="circle"></div>
+    <div class="halfway"></div>
+    <div class="arc-left"></div>
+    <div class="arc-right"></div>
+  </div>
+  <div class="kicker">⚽ WILLIAM HILL SCOTTISH PREMIERSHIP — 2026/27</div>
+  <h1 class="title">SCOTTISH FOOTBALL, ALL 12 CLUBS</h1>
+  <p class="subtitle">Unofficial neon hub for the whole Scottish Premiership — friendlies, league fixtures, predictions, league table &amp; official watch links, all filterable by date, type and club.</p>
+</header>
+
+<section id="opener" class="wrap">
+  <div class="section-head"><h2>⚽ Season Kickoff</h2><div class="bar"></div></div>
+  <p class="section-sub">Times shown in UK time (Europe/London)</p>
+  <div class="season-card">
+    <div class="season-meta">First match of the 2026/27 season</div>
+    <div class="season-countdown" id="cd-season">--d --h --m --s</div>
+    <div class="season-meta">Dundee United vs Rangers · Friday 31 July 2026 · 8:00 PM, live on Sky Sports</div>
+  </div>
+</section>
+
+<section id="fixtures" class="wrap">
+  <div class="section-head"><h2>⚽ Fixture Explorer</h2><div class="bar"></div></div>
+  <p class="section-sub">Friendlies and league matches for every Scottish Premiership club — filter by date range, match type, or club.</p>
+
+  <div class="filter-bar">
+    <div class="filter-row">
+      <span class="filter-label">Range</span>
+      <button class="chip range active" data-range="all">All</button>
+      <button class="chip range" data-range="week">This Week</button>
+      <button class="chip range" data-range="month">This Month</button>
+      <button class="chip range" data-range="3months">Next 3 Months</button>
+      <div class="date-inputs">
+        <span>Custom:</span>
+        <input type="date" id="fromDate">
+        <span>to</span>
+        <input type="date" id="toDate">
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Type</span>
+      <button class="chip type active" data-type="all">All Types</button>
+      <button class="chip type" data-type="league">League</button>
+      <button class="chip type" data-type="friendly">Friendly</button>
+    </div>
+    <div class="filter-row" id="clubRow">
+      <span class="filter-label">Clubs</span>
+      <!-- club chips injected by JS -->
+      <button class="chip" id="clubsClear">Clear Selection</button>
+    </div>
+  </div>
+
+  <p class="results-meta" id="resultsMeta"></p>
+  <div class="match-grid" id="matchResults"></div>
+  <p id="noResults" style="display:none;">No matches found for this filter — try widening the date range or clearing club/type filters.</p>
+</section>
+
+<section id="predictions" class="wrap">
+  <div class="section-head"><h2>🔮 Predictions</h2><div class="bar"></div></div>
+  <p class="section-sub">A prediction for each upcoming match unlocks 7 days before kickoff, built from last season's final standings, the summer's manager changes, and each side's known form — not a live model, just analysis done in advance and gated by date.</p>
+  <div class="pred-grid" id="predResults"></div>
+</section>
+
+<section id="livestats" class="wrap">
+  <div class="section-head"><h2>📊 Live Stats</h2><div class="bar"></div></div>
+  <p class="section-sub">Shows a real match clock whenever a fixture from this site is actually underway — honestly, with no invented numbers.</p>
+  <div class="live-card" id="liveCard">
+    <div class="live-idle-icon">⏱️</div>
+    <div>Checking for a live match…</div>
+  </div>
+</section>
+
+<section id="mvps" class="wrap">
+  <div class="section-head"><h2>🌟 MVP Of Each Club's Last Game</h2><div class="bar"></div></div>
+  <p class="section-sub">Every club's most recently played match and its standout performer, pulled from real match reports as of 12 Jul 2026. Where no reporter actually named a standout, this says so honestly instead of inventing one — several clubs (marked "last season") hadn't had a pre-season friendly confirmed as played yet at time of writing.</p>
+  <div class="mvp-grid">
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Aberdeen</div>
+      <div class="mvp-match">Lost 0–1 away to FC Twente · Sat 4 Jul 2026</div>
+      <div class="mvp-name none">No standout named</div>
+      <div class="mvp-reason">Match reports covered the result but didn't single out an individual performer in a tight away defeat.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Celtic</div>
+      <div class="mvp-match">Drew 1–1 vs Shelbourne (Ireland) · Tue 7 Jul 2026</div>
+      <div class="mvp-name">Liam Kennedy</div>
+      <div class="mvp-reason">17-year-old midfielder made his senior bow and "didn't look out of place." Rated among the match's joint-highest (7/10) alongside Callum McGregor, Maik Nawrocki and Thomas Hatton.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Dundee</div>
+      <div class="mvp-match">Drew 1–1 away to Brechin City · Thu 9 Jul 2026</div>
+      <div class="mvp-name none">No standout named</div>
+      <div class="mvp-reason">A low-key, level pre-season draw with no individual performer singled out in coverage.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Dundee United</div>
+      <div class="mvp-match">Won 3–1 vs Dunfermline Athletic · behind-closed-doors friendly</div>
+      <div class="mvp-name none">No standout named</div>
+      <div class="mvp-reason">Club coverage focused on the team performance in a comfortable closed-doors win, without naming a best performer.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag stale">Last Season</span>
+      <div class="mvp-club">Falkirk</div>
+      <div class="mvp-match">Lost 2–5 vs Rangers (final day, 2025/26) · Sat 16 May 2026</div>
+      <div class="mvp-name none">Not researched</div>
+      <div class="mvp-reason">No 2026 pre-season friendly result could be confirmed as played yet — this is Falkirk's last verified competitive match rather than a fresh MVP pick.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Hearts</div>
+      <div class="mvp-match">Lost 1–2 away to Livingston · Fri 10 Jul 2026</div>
+      <div class="mvp-name">Calvin Miller</div>
+      <div class="mvp-reason">Summer signing repeatedly praised as "likeliest in front of goal," driving forward in a losing effort. Jordi Altena (6/10) was the other bright spot at right-back.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Hibernian</div>
+      <div class="mvp-match">Lost 0–1 away to Shamrock Rovers (Dublin) · Tue 30 Jun 2026</div>
+      <div class="mvp-name none">No standout named</div>
+      <div class="mvp-reason">A makeshift 20-player squad looked off the pace against opponents further into their season, per boss David Gray. Youngsters Zach Bruce, Lewis Gillie, Josh McDonald, Joseph McGrath and Jacob MacIntyre got valuable minutes.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Kilmarnock</div>
+      <div class="mvp-match">Won 3–0 vs The New Saints · closed-doors friendly, Rugby Park</div>
+      <div class="mvp-name none">No single standout named</div>
+      <div class="mvp-reason">Goals shared across the team: Greg Kiltie, Marley Watkins and Scott Tiffoney all scored in a comfortable win.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag stale">Last Season</span>
+      <div class="mvp-club">Motherwell</div>
+      <div class="mvp-match">Won 1–0 away to Hibernian (final day, 2025/26) · Sat 16 May 2026</div>
+      <div class="mvp-name none">Not researched</div>
+      <div class="mvp-reason">A Genk pre-season friendly was announced but no played result could be confirmed yet — this is Motherwell's last verified competitive match instead.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">Rangers</div>
+      <div class="mvp-match">Won 5–1 vs Raith Rovers · closed-doors friendly, Auchenhowie</div>
+      <div class="mvp-name none">No single standout named</div>
+      <div class="mvp-reason">New boss Derek McInnes tried out an experimental line-up missing several first-teamers on international duty; Lyall Cameron, Tuur Rommens, Nedim Bajrami, Ryan Naderi and McCrorie all got on the scoresheet.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">St Johnstone</div>
+      <div class="mvp-match">Won 3–0 vs Montrose · pre-season friendly</div>
+      <div class="mvp-name">Logan Chalmers</div>
+      <div class="mvp-reason">New signing came on at half-time and scored inside the hour — the standout impact contribution alongside goals from Ruari Paton and Chieck Diabate.</div>
+    </div>
+
+    <div class="mvp-card">
+      <span class="mvp-src-tag">Friendly</span>
+      <div class="mvp-club">St Mirren</div>
+      <div class="mvp-match">Won 4–2 away to Arbroath · Thu 9 Jul 2026</div>
+      <div class="mvp-name">Roland Idowu</div>
+      <div class="mvp-reason">Bagged a double as St Mirren opened their pre-season campaign with a win — the clearest individual standout of any club's most recent match.</div>
+    </div>
+
+  </div>
+</section>
+
+<section id="table" class="wrap">
+  <div class="section-head"><h2>⚽ League Table</h2><div class="bar"></div></div>
+  <p class="section-sub">Season hasn't kicked off yet — every club starts level on zero. This fills in as results come in.</p>
+  <div style="overflow-x:auto;">
+    <table class="sched">
+      <thead>
+        <tr><th>#</th><th>Club</th><th class="num">P</th><th class="num">W</th><th class="num">D</th><th class="num">L</th><th class="num">Pts</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Aberdeen</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>2</td><td>Celtic</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>3</td><td>Dundee</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>4</td><td>Dundee United</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>5</td><td>Falkirk</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>6</td><td>Heart of Midlothian</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>7</td><td>Hibernian</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>8</td><td>Kilmarnock</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>9</td><td>Motherwell</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>10</td><td>Rangers</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>11</td><td>St Johnstone</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>12</td><td>St Mirren</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="oldfirm" class="wrap">
+  <div class="section-head"><h2>⚽ Old Firm Spotlight</h2><div class="bar"></div></div>
+  <p class="section-sub">The biggest fixture on the calendar gets its own countdown</p>
+  <div class="derby-card">
+    <div class="derby-teams">
+      <div class="club">
+        <div class="crest celtic">CFC</div>
+        <div class="club-name">Celtic</div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="club">
+        <div class="crest rangers">RFC</div>
+        <div class="club-name">Rangers</div>
+      </div>
+    </div>
+    <div class="derby-meta">Scottish Premiership · Celtic Park, Glasgow</div>
+    <div class="countdown" id="cd1">--d --h --m --s</div>
+    <div class="derby-meta">Sunday 20 September 2026 · Kickoff 12:00 PM BST</div>
+    <div class="watch-row">
+      <a class="watch-btn" href="https://www.skysports.com/watch-live" target="_blank" rel="noopener">📡 Watch on Sky Sports</a>
+      <a class="watch-btn outline" href="https://www.premiersports.com" target="_blank" rel="noopener">Premier Sports</a>
+    </div>
+  </div>
+
+  <div class="match-grid" style="margin-top:20px;">
+    <div class="match-card">
+      <div class="badge-row"><span class="badge">Full Time · 3 Jan 2026</span><span class="venue">Celtic Park</span></div>
+      <div class="teams-row">
+        <div class="team"><span class="team-name">Celtic</span></div>
+        <div class="score">1 – 3</div>
+        <div class="team"><span class="team-name">Rangers</span></div>
+      </div>
+      <div class="note">Rangers won the most recent Old Firm derby</div>
+    </div>
+    <div class="match-card">
+      <div class="badge-row"><span class="badge">All 2026/27 meetings</span></div>
+      <table class="sched" style="font-size:0.86rem;">
+        <tbody>
+          <tr><td>Celtic vs Rangers</td><td>Sun 20 Sep 2026</td><td><span class="tag of">Next Up</span></td></tr>
+          <tr><td>Rangers vs Celtic</td><td>Sat 2 Jan 2027</td><td><span class="tag">Scheduled</span></td></tr>
+          <tr><td>Celtic vs Rangers</td><td>Sat 27 Feb 2027</td><td><span class="tag">Scheduled</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="watch" class="wrap">
+  <div class="section-head"><h2>📡 Where To Watch</h2><div class="bar"></div></div>
+  <p class="section-sub">Scottish Premiership rights are split between two broadcasters — this hub links straight to their official streams, it doesn't rebroadcast anything itself.</p>
+  <div class="watch-grid">
+    <div class="watch-card">
+      <h4>📡 Sky Sports</h4>
+      <p>Up to 60 live Scottish Premiership matches a season across all 12 clubs, including the entire opening weekend and every Old Firm derby played on a Sky-selected slot.</p>
+      <a href="https://www.skysports.com/watch-live" target="_blank" rel="noopener">Watch on Sky Sports →</a>
+    </div>
+    <div class="watch-card">
+      <h4>📡 Premier Sports</h4>
+      <p>Carries 22 live Premiership matches a season, including pre-split fixtures not picked up by Sky, across the whole league.</p>
+      <a href="https://www.premiersports.com" target="_blank" rel="noopener">Watch on Premier Sports →</a>
+    </div>
+    <div class="watch-card">
+      <h4>🏴󠁧󠁢󠁳󠁣󠁴󠁿 BBC Scotland / Alba</h4>
+      <p>Highlights, radio commentary and select Gaelic-language coverage across the whole Premiership.</p>
+      <a href="https://www.bbc.co.uk/sport/football/scottish-premiership" target="_blank" rel="noopener">BBC Sport Scotland →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap disclaimer">
+    Unofficial fan-made dashboard for personal use — not affiliated with or endorsed by the SPFL, any club, or any broadcaster. Friendlies and opening-weekend fixtures reflect officially published/reported matches as of 12 Jul 2026; the league table shows every club level on zero ahead of kickoff. This isn't every friendly every club is playing — only the ones publicly confirmed at build time — and later matchweeks will be added the same way once they're officially confirmed, rather than guessed in advance. Predictions are analysis written in advance from last season's final standings and known squad/manager changes, gated to reveal 7 days before each kickoff — they are not generated live by an AI model watching real-time stats, since a static page can't safely call one on its own; refreshing them with up-to-date research is something that has to be requested again as the season goes on. The MVP section reflects real match reports found at build time, not a live feed — two clubs' entries are their last competitive 2025/26 match because no 2026 pre-season friendly result could be confirmed as played yet, and several others honestly say "no standout named" where match reports didn't single anyone out, rather than inventing a name. The visit counter is a real, live count from a third-party counting API, not a made-up figure. Always confirm kickoff times with official sources, as these can move for TV selection. This page only links out to official, legal broadcast partners.
+  </div>
+</footer>
+
+<script>
+  const seasonTarget = new Date('2026-07-31T19:00:00Z'); // 8:00 PM BST = 19:00 UTC
+  const derbyTarget = new Date('2026-09-20T11:00:00Z');  // 12:00 PM BST = 11:00 UTC
+
+  function fmt(diff){
+    if (diff <= 0) return 'KICKOFF!';
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+  }
+  function tick(){
+    const now = new Date();
+    document.getElementById('cd-season').textContent = fmt(seasonTarget - now);
+    document.getElementById('cd1').textContent = fmt(derbyTarget - now);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* ---------------- FIXTURE EXPLORER ---------------- */
+  const CLUBS = ['Aberdeen','Celtic','Dundee','Dundee United','Falkirk','Hearts','Hibernian',
+    'Kilmarnock','Motherwell','Rangers','St Johnstone','St Mirren'];
+
+  // Real, verified matches — friendlies + published 2026/27 league fixtures.
+  // date/time are UTC ISO so the countdown/sort logic is unambiguous; displayDate/displayTime are for humans.
+  const MATCHES = [
+    // Pre-season friendlies
+    {iso:'2026-06-30T19:00:00Z', display:'Tue 30 Jun 2026, 8:00 PM', type:'friendly', home:'Hibernian', away:'Shamrock Rovers', clubs:['Hibernian'], venue:'Tallaght Stadium, Dublin'},
+    {iso:'2026-07-07T15:00:00Z', display:'Tue 7 Jul 2026', type:'friendly', home:'Celtic', away:'Shelbourne', clubs:['Celtic'], venue:'Ireland'},
+    {iso:'2026-07-10T18:45:00Z', display:'Fri 10 Jul 2026, 7:45 PM', type:'friendly', home:'Livingston', away:'Hearts', clubs:['Hearts'], venue:'Almondvale Stadium'},
+    {iso:'2026-07-14T18:30:00Z', display:'Tue 14 Jul 2026, 7:30 PM', type:'friendly', home:'Arbroath', away:'Hearts', clubs:['Hearts'], venue:'Gayfield',
+      pred:{score:'1–3 Hearts', confidence:'medium', text:'Hearts arrive as reigning Premiership runners-up with a clear quality and squad-depth edge over a Championship side, even one as well-run as Arbroath (3rd, playoff-chasing last term). New boss Wouter Vrancken is more likely using this to bed in his system than to chase a big scoreline, so expect Hearts on top without necessarily running riot.'}},
+    {iso:'2026-07-17T18:45:00Z', display:'Fri 17 Jul 2026, 7:45 PM', type:'friendly', home:'Hearts', away:'Rayo Vallecano', clubs:['Hearts'], venue:'Tynecastle Park',
+      pred:{score:'1–2 Rayo Vallecano', confidence:'low', text:"Rayo were beaten finalists in the 2025/26 UEFA Conference League (lost 1-0 to Crystal Palace), so this is Hearts' toughest pre-season test by some distance. Expect Rayo's extra technical quality to tell, but squad rotation and shared minutes in a friendly like this make a scoreline hard to call with real confidence."}},
+    {iso:'2026-07-24T18:30:00Z', display:'Fri 24 Jul 2026, 7:30 PM', type:'friendly', home:'Raith Rovers', away:'Hearts', clubs:['Hearts'], venue:"Stark's Park, Kirkcaldy",
+      pred:{score:'1–4 Hearts', confidence:'medium', text:"Raith Rovers sit two tiers below Hearts. By this point Hearts will have three friendlies of match sharpness under new management, and the gap in quality should show clearly."}},
+    {iso:'2026-07-26T15:00:00Z', display:'Sun 26 Jul 2026', type:'friendly', home:'Rangers', away:'West Ham United', clubs:['Rangers'], venue:'Ibrox',
+      pred:{score:'1–1 draw', confidence:'low', text:"Rangers' first ticketed test under new boss Derek McInnes (arriving after guiding Hearts to 2nd last season) against Premier League opposition. Summer friendlies like this hinge heavily on how much West Ham rotate for what's effectively a pre-season tour game, which makes the scoreline genuinely hard to call."}},
+    // Opening weekend — league, verified
+    {iso:'2026-07-31T19:00:00Z', display:'Fri 31 Jul 2026, 8:00 PM', type:'league', tv:true, home:'Dundee United', away:'Rangers', clubs:['Dundee United','Rangers'], venue:'Tannadice Park',
+      pred:{score:'1–2 Rangers', confidence:'medium', text:"Rangers finished 3rd last season, 8 points off Hearts in 2nd, and have brought in Derek McInnes specifically to close that gap — new-manager bounce plus a squad that should be significantly stronger than 7th-placed Dundee United's points to an away win, though season-opener nerves make it less than a certainty."}},
+    {iso:'2026-08-01T14:00:00Z', display:'Sat 1 Aug 2026, 3:00 PM', type:'league', tv:true, home:'Falkirk', away:'St Mirren', clubs:['Falkirk','St Mirren'], venue:'Falkirk Stadium',
+      pred:{score:'2–1 Falkirk', confidence:'medium', text:"Falkirk's 6th-place finish last season was a strong showing on their return to the top flight, and they'll fancy a home opener against a St Mirren side that struggled to 10th. Close on paper, but home form and momentum favour Falkirk."}},
+    {iso:'2026-08-01T16:30:00Z', display:'Sat 1 Aug 2026, 5:30 PM', type:'league', tv:true, home:'Aberdeen', away:'Hearts', clubs:['Aberdeen','Hearts'], venue:'Pittodrie',
+      pred:{score:'1–2 Hearts', confidence:'medium', text:"Hearts finished a distant 2nd last season while Aberdeen struggled to 8th, so there's a real gap in quality. The variable is Wouter Vrancken's first competitive game in charge — new-manager teething issues could make this tighter than the form book suggests."}},
+    {iso:'2026-08-02T13:00:00Z', display:'Sun 2 Aug 2026, 2:00 PM', type:'league', tv:true, home:'St Johnstone', away:'Kilmarnock', clubs:['St Johnstone','Kilmarnock'], venue:'McDiarmid Park',
+      pred:{score:'1–1 draw', confidence:'low', text:"St Johnstone come into this as a promoted/returning top-flight side with little current top-flight form to judge them on, while Kilmarnock endured a poor 11th-placed campaign. Genuinely hard to price — a home-crowd-lifted draw is a reasonable neutral pick."}},
+    {iso:'2026-08-02T15:30:00Z', display:'Sun 2 Aug 2026, 4:30 PM', type:'league', tv:true, home:'Hibernian', away:'Motherwell', clubs:['Hibernian','Motherwell'], venue:'Easter Road',
+      pred:{score:'2–1 Hibernian', confidence:'medium', text:"Two of last season's mid-table overperformers (Motherwell 4th, Hibernian 5th) meet in a fixture that could easily go either way. Home advantage at Easter Road is enough to give Hibs a slight edge on paper."}},
+    {iso:'2026-08-03T18:30:00Z', display:'Mon 3 Aug 2026, 7:30 PM', type:'league', tv:true, home:'Celtic', away:'Dundee', clubs:['Celtic','Dundee'], venue:'Celtic Park',
+      pred:{score:'3–0 Celtic', confidence:'high', text:"Celtic open the defence of their record 56th title at home against a Dundee side that finished 9th last season. The squad-quality gap here is the largest of the opening weekend, and Celtic Park on the season's big kickoff night should produce a comfortable home win."}},
+    // Old Firm derbies, full season
+    {iso:'2026-01-03T00:00:00Z', display:'Sat 3 Jan 2026 (result: 1–3)', type:'league', home:'Celtic', away:'Rangers', clubs:['Celtic','Rangers'], venue:'Celtic Park', result:'1–3'},
+    {iso:'2026-09-20T11:00:00Z', display:'Sun 20 Sep 2026, 12:00 PM', type:'league', tv:true, home:'Celtic', away:'Rangers', clubs:['Celtic','Rangers'], venue:'Celtic Park',
+      pred:{score:'2–1 Celtic', confidence:'low', text:"Too far out for a confident read this early — five matchweeks of real 2026/27 form will happen before kickoff. For now: reigning champions Celtic at home, against a Rangers side still bedding in Derek McInnes. Treat this one as a placeholder to be revisited once the season's actually underway."}},
+    {iso:'2027-01-02T15:00:00Z', display:'Sat 2 Jan 2027, 3:00 PM', type:'league', home:'Rangers', away:'Celtic', clubs:['Rangers','Celtic'], venue:'Ibrox'},
+    {iso:'2027-02-27T15:00:00Z', display:'Sat 27 Feb 2027, 3:00 PM', type:'league', home:'Celtic', away:'Rangers', clubs:['Celtic','Rangers'], venue:'Celtic Park'},
+  ];
+
+  const state = { range:'all', from:null, to:null, type:'all', clubs:new Set() };
+
+  // Build club chips
+  const clubRow = document.getElementById('clubRow');
+  const clearBtn = document.getElementById('clubsClear');
+  CLUBS.forEach(club => {
+    const btn = document.createElement('button');
+    btn.className = 'chip club';
+    btn.textContent = club;
+    btn.dataset.club = club;
+    btn.addEventListener('click', () => {
+      if (state.clubs.has(club)) state.clubs.delete(club); else state.clubs.add(club);
+      btn.classList.toggle('active');
+      renderMatches();
+    });
+    clubRow.insertBefore(btn, clearBtn);
+  });
+  clearBtn.addEventListener('click', () => {
+    state.clubs.clear();
+    clubRow.querySelectorAll('.chip.club').forEach(b => b.classList.remove('active'));
+    renderMatches();
+  });
+
+  document.querySelectorAll('.chip.range').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chip.range').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.range = btn.dataset.range;
+      document.getElementById('fromDate').value = '';
+      document.getElementById('toDate').value = '';
+      state.from = null; state.to = null;
+      renderMatches();
+    });
+  });
+  document.querySelectorAll('.chip.type').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chip.type').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.type = btn.dataset.type;
+      renderMatches();
+    });
+  });
+  document.getElementById('fromDate').addEventListener('change', e => {
+    state.from = e.target.value ? new Date(e.target.value + 'T00:00:00Z') : null;
+    document.querySelectorAll('.chip.range').forEach(b => b.classList.remove('active'));
+    renderMatches();
+  });
+  document.getElementById('toDate').addEventListener('change', e => {
+    state.to = e.target.value ? new Date(e.target.value + 'T23:59:59Z') : null;
+    document.querySelectorAll('.chip.range').forEach(b => b.classList.remove('active'));
+    renderMatches();
+  });
+
+  function rangeWindow(){
+    if (state.from || state.to) return { from: state.from, to: state.to };
+    const now = new Date();
+    if (state.range === 'week'){
+      const to = new Date(now.getTime() + 7*86400000);
+      return { from: now, to };
+    }
+    if (state.range === 'month'){
+      const to = new Date(now); to.setUTCMonth(to.getUTCMonth()+1);
+      return { from: now, to };
+    }
+    if (state.range === '3months'){
+      const to = new Date(now); to.setUTCMonth(to.getUTCMonth()+3);
+      return { from: now, to };
+    }
+    return { from:null, to:null }; // 'all'
+  }
+
+  function renderMatches(){
+    const { from, to } = rangeWindow();
+    const filtered = MATCHES.filter(m => {
+      const d = new Date(m.iso);
+      if (from && d < from) return false;
+      if (to && d > to) return false;
+      if (state.type !== 'all' && m.type !== state.type) return false;
+      if (state.clubs.size > 0 && !m.clubs.some(c => state.clubs.has(c))) return false;
+      return true;
+    }).sort((a,b) => new Date(a.iso) - new Date(b.iso));
+
+    const container = document.getElementById('matchResults');
+    const noResults = document.getElementById('noResults');
+    const meta = document.getElementById('resultsMeta');
+    meta.textContent = `${filtered.length} match${filtered.length === 1 ? '' : 'es'} found`;
+
+    if (filtered.length === 0){
+      container.innerHTML = '';
+      noResults.style.display = 'block';
+      return;
+    }
+    noResults.style.display = 'none';
+
+    const now = new Date();
+    container.innerHTML = filtered.map(m => {
+      const isPast = new Date(m.iso) < now;
+      const typeBadge = m.type === 'friendly'
+        ? '<span class="badge friendly-badge">Friendly</span>'
+        : '<span class="badge league-badge">League</span>';
+      const tvBadge = m.tv ? '<span class="badge tv">TV</span>' : '';
+      const pastCls = isPast ? ' past' : '';
+      const scoreOrVs = m.result
+        ? `<div class="score">${m.result}</div>`
+        : '<div class="vs-small">VS</div>';
+      return `
+        <div class="match-card ${m.type === 'friendly' ? 'friendly' : ''}">
+          <div class="badge-row">
+            <span class="badge${pastCls}">${m.display}</span>
+            ${typeBadge}${tvBadge}
+          </div>
+          <div class="teams-row">
+            <div class="team"><span class="team-name">${m.home}</span></div>
+            ${scoreOrVs}
+            <div class="team"><span class="team-name">${m.away}</span></div>
+          </div>
+          <div class="note">${m.venue}</div>
+        </div>`;
+    }).join('');
+  }
+
+  renderMatches();
+
+  /* ---------------- PREDICTIONS ---------------- */
+  function renderPredictions(){
+    const now = new Date();
+    const upcoming = MATCHES
+      .filter(m => new Date(m.iso) > now && !m.result)
+      .sort((a,b) => new Date(a.iso) - new Date(b.iso));
+
+    const container = document.getElementById('predResults');
+    container.innerHTML = upcoming.map(m => {
+      const matchDate = new Date(m.iso);
+      const daysUntil = (matchDate - now) / 86400000;
+      const fixtureLabel = `${m.home} vs ${m.away}`;
+
+      if (daysUntil > 7){
+        const unlockDate = new Date(matchDate.getTime() - 7*86400000);
+        const unlockStr = unlockDate.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+        return `
+          <div class="pred-card locked">
+            <div class="pred-lock-icon">🔒</div>
+            <div class="pred-head"><span class="pred-fixture">${fixtureLabel}</span></div>
+            <div class="pred-meta">${m.display} · ${m.venue}</div>
+            <div class="pred-unlock-note">Prediction unlocks ${unlockStr} — 7 days before kickoff</div>
+          </div>`;
+      }
+
+      if (!m.pred){
+        return `
+          <div class="pred-card locked">
+            <div class="pred-head"><span class="pred-fixture">${fixtureLabel}</span></div>
+            <div class="pred-meta">${m.display} · ${m.venue}</div>
+            <div class="pred-unlock-note">Inside the 7-day window, but no analysis has been prepared for this one yet.</div>
+          </div>`;
+      }
+
+      return `
+        <div class="pred-card unlocked">
+          <div class="pred-head">
+            <span class="pred-fixture"><span class="ball-icon">⚽</span>${fixtureLabel}</span>
+            <span class="conf ${m.pred.confidence}">${m.pred.confidence} confidence</span>
+          </div>
+          <div class="pred-meta">${m.display} · ${m.venue}</div>
+          <div class="pred-score">${m.pred.score}</div>
+          <div class="pred-text">${m.pred.text}</div>
+        </div>`;
+    }).join('');
+  }
+
+  renderPredictions();
+
+  /* ---------------- VISIT COUNTER (real, no invented numbers) ---------------- */
+  // Uses Abacus (abacus.jasoncameron.dev) — a free, no-signup, real counting API.
+  // Every real page load that successfully reaches this API increments a genuine shared count.
+  // If the request fails (offline, API down, blocked), we show that honestly instead of guessing a number.
+  (async function loadVisitCounter(){
+    const el = document.getElementById('visitCounter');
+    try {
+      const res = await fetch('https://abacus.jasoncameron.dev/hit/scottish-prem-neon-hub-cmp/page-loads');
+      if (!res.ok) throw new Error('bad response');
+      const data = await res.json();
+      el.innerHTML = `👥 <strong>${data.value.toLocaleString()}</strong> real page loads`;
+    } catch (e) {
+      el.textContent = '👥 live count unavailable right now';
+    }
+  })();
+
+  /* ---------------- LIVE STATS ---------------- */
+  const LIVE_WINDOW_MS = 135 * 60 * 1000; // kickoff + ~135 min covers 90 min, HT and stoppage
+
+  function renderLiveStats(){
+    const now = new Date();
+    const card = document.getElementById('liveCard');
+
+    const liveMatch = MATCHES.find(m => {
+      const k = new Date(m.iso);
+      return now >= k && now <= new Date(k.getTime() + LIVE_WINDOW_MS);
+    });
+
+    if (liveMatch){
+      const kickoff = new Date(liveMatch.iso);
+      const elapsedMin = Math.floor((now - kickoff) / 60000);
+      card.className = 'live-card is-live';
+      card.innerHTML = `
+        <div class="live-badge-text"><span class="live-dot"></span>LIVE NOW</div>
+        <div class="live-fixture">${liveMatch.home} vs ${liveMatch.away}</div>
+        <div class="live-clock">~${elapsedMin}' elapsed (approx, from kickoff time)</div>
+        <div class="live-note">
+          This site doesn't have a connected live sports-data feed, so it won't invent a score or possession stats here.
+          For real live score and stats right now, check
+          <a href="https://www.bbc.co.uk/sport/football/scottish-premiership/scores-fixtures" target="_blank" rel="noopener" style="color:var(--gold);">BBC Sport's live scores</a>
+          or <a href="https://www.skysports.com/scottish-premiership-results" target="_blank" rel="noopener" style="color:var(--gold);">Sky Sports</a>.
+        </div>`;
+      return;
+    }
+
+    const upcoming = MATCHES
+      .filter(m => new Date(m.iso) > now)
+      .sort((a,b) => new Date(a.iso) - new Date(b.iso))[0];
+
+    card.className = 'live-card';
+    card.innerHTML = `
+      <div class="live-idle-icon">⏱️</div>
+      <div>No match involving these clubs is live right now.</div>
+      ${upcoming ? `<div class="live-note">Next up: <strong style="color:var(--text);">${upcoming.home} vs ${upcoming.away}</strong> — ${upcoming.display}</div>` : ''}
+      <div class="live-note">When a match is live, this panel shows a real match clock computed from kickoff time. Full in-play stats (possession, shots, cards) need a connected live sports-data API (e.g. API-Football's free tier) — ask to have one wired in if you want that automated.</div>`;
+  }
+
+  renderLiveStats();
+  setInterval(renderLiveStats, 30000);
+</script>
+
+</body>
+</html>
