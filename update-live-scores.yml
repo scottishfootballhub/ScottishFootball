@@ -1,0 +1,104 @@
+name: Update Live Scores
+
+# Runs on a schedule to pull real Scottish Premiership fixtures/scores from API-Football
+# and commit them to data/live.json, which the site reads client-side.
+# Your API key never touches the website itself — it only ever lives in this workflow,
+# read from the repo's encrypted "API_FOOTBALL_KEY" secret.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'   # every 20 minutes, all day — well inside the free plan's 100 requests/day
+  workflow_dispatch: {}       # lets you trigger a run manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve Scottish Premiership league ID (one-time, then cached)
+        env:
+          API_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          set -e
+          mkdir -p data
+          if [ ! -s data/league_id.txt ]; then
+            echo "No cached league ID yet — looking it up..."
+            curl -s -H "x-apisports-key: $API_KEY" \
+              "https://v3.football.api-sports.io/leagues?name=Premiership&country=Scotland" \
+              -o /tmp/league_lookup.json
+            LEAGUE_ID=$(jq -r '.response[0].league.id // empty' /tmp/league_lookup.json)
+            if [ -z "$LEAGUE_ID" ]; then
+              echo "::error::Could not resolve the Scottish Premiership league ID. Raw API response:"
+              cat /tmp/league_lookup.json
+              exit 1
+            fi
+            echo "$LEAGUE_ID" > data/league_id.txt
+            echo "Resolved league ID: $LEAGUE_ID"
+          else
+            echo "Using cached league ID: $(cat data/league_id.txt)"
+          fi
+
+      - name: Fetch fixtures & scores
+        env:
+          API_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          set -e
+          LEAGUE_ID=$(cat data/league_id.txt)
+
+          # Scottish season runs roughly July -> May, so the "season" year is whichever July
+          # most recently started (matches API-Football's convention of naming a season by
+          # its starting year).
+          MONTH=$(date -u +%-m)
+          YEAR=$(date -u +%Y)
+          if [ "$MONTH" -ge 7 ]; then SEASON=$YEAR; else SEASON=$((YEAR - 1)); fi
+
+          curl -s -H "x-apisports-key: $API_KEY" \
+            "https://v3.football.api-sports.io/fixtures?league=${LEAGUE_ID}&season=${SEASON}" \
+            -o /tmp/fixtures.json
+
+          if ! jq -e '.response' /tmp/fixtures.json > /dev/null 2>&1; then
+            echo "::error::Unexpected API response — not writing over the existing data/live.json."
+            cat /tmp/fixtures.json
+            exit 1
+          fi
+
+          UPDATED=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          jq --arg updated "$UPDATED" --argjson leagueId "$LEAGUE_ID" --argjson season "$SEASON" '{
+            updated: $updated,
+            leagueId: $leagueId,
+            season: $season,
+            fixtures: [ .response[] | {
+              id: .fixture.id,
+              date: .fixture.date,
+              statusShort: .fixture.status.short,
+              statusLong: .fixture.status.long,
+              elapsed: .fixture.status.elapsed,
+              venue: .fixture.venue.name,
+              home: .teams.home.name,
+              away: .teams.away.name,
+              homeWinner: .teams.home.winner,
+              awayWinner: .teams.away.winner,
+              goalsHome: .goals.home,
+              goalsAway: .goals.away
+            } ]
+          }' /tmp/fixtures.json > data/live.json
+
+          echo "Wrote $(jq '.fixtures | length' data/live.json) fixtures to data/live.json."
+
+      - name: Commit changes if any
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live.json data/league_id.txt
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Auto-update live scores"
+            git push
+          fi
